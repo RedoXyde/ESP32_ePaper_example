@@ -41,7 +41,7 @@
 #include "img1.h"
 #include "img2.h"
 #include "img3.h"
-#include "img_hacking.c"
+#include "img_hacking.h"
 #include "EPD.h"
 //#include "EPDspi.h"
 
@@ -385,7 +385,7 @@ void app_main()
 
 	_gs = 0;
 	uint32_t tstart;
-	int pass = 0, ftype = 0;
+	int pass = 0, ftype = 5;
     while (1) {
     	ftype++;
     	if (ftype > 10) {
@@ -531,7 +531,7 @@ void app_main()
 
 			EPD_fillCircle(92,16,10, 2);
 			EPD_drawCircle(92,16,11, 15);
-
+			#ifndef EPD1X54
 			EPD_fillRect(185,4,80,80, 3);
 			EPD_drawRect(185,4,80,80, 15);
 
@@ -541,7 +541,7 @@ void app_main()
 
 			EPD_fillCircle(225,44,20, 0);
 			EPD_drawCircle(225,44,20, 15);
-
+			#endif
 			orientation = LANDSCAPE_180;
 			EPD_drawRect(4,4,20,20, 15);
 
@@ -552,7 +552,7 @@ void app_main()
 
 			EPD_fillCircle(92,16,10, 2);
 			EPD_drawCircle(92,16,11, 15);
-
+			#ifndef EPD1X54
 			EPD_fillRect(185,4,80,80, 3);
 			EPD_drawRect(185,4,80,80, 15);
 
@@ -562,6 +562,7 @@ void app_main()
 
 			EPD_fillCircle(225,44,20, 0);
 			EPD_drawCircle(225,44,20, 15);
+			#endif
 			orientation = LANDSCAPE_0;
 
 			EPD_setFont(DEFAULT_FONT, NULL);
@@ -574,10 +575,10 @@ void app_main()
 			EPD_UpdateScreen();
 			_gs = old_gs;
 		}
-		else if (ftype == 6) {
+		else if (ftype == 6) { 
 			uint8_t old_gs = _gs;
 			_gs = 0;
-			memcpy(disp_buffer, (unsigned char *)gImage_img1, sizeof(gImage_img1));
+			memcpy(disp_buffer, (unsigned char *)gImage_img1, sizeof(gImage_img1));	// lena monochrome
 
 			EPD_setFont(DEFAULT_FONT, NULL);
 			sprintf(tmp_buff, "Pass: %d", pass+1);
@@ -589,7 +590,7 @@ void app_main()
 		else if (ftype == 7) {
 			uint8_t old_gs = _gs;
 			_gs = 0;
-			memcpy(disp_buffer, (unsigned char *)gImage_img3, sizeof(gImage_img3));
+			memcpy(disp_buffer, (unsigned char *)gImage_img3, sizeof(gImage_img3));	// lena grayscale, grayscale 8bits
 
 			EPD_setFont(DEFAULT_FONT, NULL);
 			_fg = 0;
@@ -610,7 +611,7 @@ void app_main()
 		    for (i=0; i<16; i++) {
 		        for (x = 0; x < EPD_DISPLAY_WIDTH; x++) {
 		          for (y = 0; y < EPD_DISPLAY_HEIGHT; y++) {
-		        	  uint8_t pix = img_hacking[(x * EPD_DISPLAY_HEIGHT) + (EPD_DISPLAY_HEIGHT-y-1)];
+		        	  uint8_t pix = img_hacking[(x * EPD_DISPLAY_HEIGHT) + (EPD_DISPLAY_HEIGHT-y-1)];		// "Hacking" image
 		        	  if ((pix > last_lvl) && (pix <= lvl_buf[i])) {
 		        		  gs_disp_buffer[(y * EPD_DISPLAY_WIDTH) + x] = i;
 		        		  gs_used_shades |= (1 << i);
@@ -627,10 +628,10 @@ void app_main()
 			EPD_UpdateScreen();
 			_gs = old_gs;
 		}
-		else if (ftype == 9) {
+		else if (ftype == 9) {			
 			uint8_t old_gs = _gs;
 			_gs = 0;
-			memcpy(disp_buffer, gImage_img2, sizeof(gImage_img2));
+			memcpy(disp_buffer, gImage_img2, sizeof(gImage_img2));// Good display
 
 			EPD_setFont(DEFAULT_FONT, NULL);
 			sprintf(tmp_buff, "Pass: %d", pass+1);
@@ -640,12 +641,13 @@ void app_main()
 			_gs = old_gs;
 		}
 		else if (ftype == 10) {
-			if (spiffs_is_mounted) {
+			if (spiffs_is_mounted ) {
 				// ** Show scaled (1/8, 1/4, 1/2 size) JPG images
 					uint8_t old_gs = _gs;
 					_gs = 1;
 					EPD_Cls();
-					EPD_jpg_image(CENTER, CENTER, 0, SPIFFS_BASE_PATH"/images/evolution-of-human.jpg", NULL, 0);
+					//int EPD_jpg_image(int x, int y, uint8_t scale, char *fname, uint8_t *buf, int size)
+					EPD_jpg_image(0, 0, 0, SPIFFS_BASE_PATH"/images/lenna200.jpg", NULL, 0);
 					EPD_UpdateScreen();
 					EPD_wait(5000);
 
@@ -670,8 +672,10 @@ void app_main()
 					EPD_wait(5000);
 
 					EPD_Cls();
+					orientation = LANDSCAPE_180;
 					EPD_jpg_image(CENTER, CENTER, 0, SPIFFS_BASE_PATH"/images/Flintstones.jpg", NULL, 0);
 					EPD_UpdateScreen();
+					orientation = LANDSCAPE_0;
 					EPD_wait(5000);
 
 					_gs = old_gs;
@@ -684,7 +688,7 @@ void app_main()
     	printf("-- Type: %d Pass: %d Time: %u ms\r\n", ftype, pass, tstart);
 
     	EPD_PowerOff();
-		EPD_wait(8000);
+		EPD_wait(3000);
     }
 
 }

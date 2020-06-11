@@ -14,12 +14,11 @@
 #include "esp_system.h"
 #include "time.h"
 #include <math.h>
-#include "rom/tjpgd.h"
+#include "esp32/rom/tjpgd.h"
 //#include "esp_heap_alloc_caps.h"
 #include "esp_heap_caps.h"
 #include "EPD.h"
 #include "EPDspi.h"
-#include "rom/tjpgd.h"
 
 
 #define DEG_TO_RAD 0.01745329252

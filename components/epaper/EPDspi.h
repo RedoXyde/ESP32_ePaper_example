@@ -14,10 +14,11 @@
 
 #include <stdint.h>
 #include "spi_master_lobo.h"
+#include "driver/gpio.h"
 
 //#define EPD2X9 1
-#define EPD2X13 1
-
+//#define EPD2X13 1
+#define EPD1X54 1
 #ifdef EPD2X9
 	#define xDot 128
 	#define yDot 296
@@ -32,21 +33,25 @@
 	#define EPD_DISPLAY_HEIGHT	120
     #define EPD_VCOM    0x78
 	#define DELAYTIME 1500
+#elif EPD1X54
+	#define xDot 200
+	#define yDot 200
+	#define EPD_DISPLAY_WIDTH   200
+	#define EPD_DISPLAY_HEIGHT  200
+  #define EPD_VCOM    0x9b
+	#define DELAYTIME 1500
 #endif
 
-//#define EPD_DISPLAY_WIDTH     296
-//#define EPD_DISPLAY_HEIGHT	128
-
-#define SCK_Pin		18
-#define MOSI_Pin	23
-//#define MISO_Pin	19
-#define DC_Pin		26
-#define BUSY_Pin	32
-#define RST_Pin		27
-#define CS_Pin		5
+#define SCK_Pin   18
+#define MOSI_Pin  23
+#define MISO_Pin  19
+#define DC_Pin    25
+#define BUSY_Pin  27
+#define RST_Pin   26
+#define CS_Pin    5
 // ePaper display can be powered from GPIO
 // if powered directly from Vcc, set this to 0
-#define POWER_Pin	22
+#define POWER_Pin  0
 
 #define DC_VAL (1 << DC_Pin)
 
